@@ -10,6 +10,7 @@ repositories {
 }
 
 dependencies {
+    implementation(project(":exposed-transaction-extension"))
     implementation(project(":kotlin-format-extension"))
 
     implementation("org.jetbrains.exposed:exposed-core:0.41.1")
