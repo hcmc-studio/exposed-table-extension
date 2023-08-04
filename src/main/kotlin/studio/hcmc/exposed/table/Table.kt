@@ -3,6 +3,7 @@ package studio.hcmc.exposed.table
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 import studio.hcmc.exposed.transaction.blockingTransaction
+import studio.hcmc.exposed.transaction.suspendedTransaction
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.full.memberProperties
 
@@ -35,21 +36,20 @@ fun <T : Comparable<T>, E : EntityID<T>> Table.optReference(
         .apply(configure)
 }
 
-fun Table.create(transaction: Transaction? = null): List<String> {
-    val missingColumns = blockingTransaction(transaction) {
-        this@create::class.memberProperties.forEach {
-            it.call(this@create)
+suspend fun Table.create(transaction: Transaction? = null): List<String> {
+    val table = this
+    return suspendedTransaction(transaction) {
+        for (memberProperty in table::class.memberProperties) {
+            memberProperty.call(table)
         }
-        SchemaUtils.create(this@create)
-        SchemaUtils.addMissingColumnsStatements(this@create)
-    }
 
-    if (missingColumns.isNotEmpty()) {
-        exposedLogger.warn("Missing column(s) for table `${tableName}`: $missingColumns")
-        blockingTransaction(transaction) {
+        SchemaUtils.create(table)
+        val missingColumns = SchemaUtils.addMissingColumnsStatements(table)
+        if (missingColumns.isNotEmpty()) {
+            exposedLogger.warn("Missing column(s) for table `${tableName}`: $missingColumns")
             execInBatch(missingColumns)
         }
-    }
 
-    return missingColumns
+        missingColumns
+    }
 }
