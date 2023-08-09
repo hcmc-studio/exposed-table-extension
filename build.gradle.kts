@@ -1,22 +1,35 @@
 plugins {
     kotlin("jvm") version "1.9.0"
+    id("maven-publish")
 }
 
 group = "studio.hcmc"
-version = "1.0-SNAPSHOT"
+version = "0.0.4"
 
 repositories {
     mavenCentral()
-}
-
-dependencies {
-    implementation(project(":exposed-transaction-extension"))
-    implementation(project(":kotlin-format-extension"))
-
-    implementation("org.jetbrains.exposed:exposed-core:0.41.1")
-    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.41.1")
+    maven { setUrl("https://jitpack.io") }
 }
 
 kotlin {
     jvmToolchain(17)
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = "studio.hcmc"
+            artifactId = "exposed-table-extension"
+            version = "0.0.4"
+            from(components["java"])
+        }
+    }
+}
+
+dependencies {
+    implementation("com.github.hcmc-studio:exposed-transaction-extension:0.0.4-build-01")
+    implementation("com.github.hcmc-studio:kotlin-format-extension:0.0.4-build-01")
+
+    implementation("org.jetbrains.exposed:exposed-core:0.41.1")
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.41.1")
 }
