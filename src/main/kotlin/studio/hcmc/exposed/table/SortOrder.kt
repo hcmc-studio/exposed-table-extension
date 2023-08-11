@@ -26,6 +26,7 @@ fun <T : Comparable<T>, S : T?> SortOrder.buildOp(expression: Expression<in S>, 
     }
 }
 
+@JvmName("buildOpEntityId")
 fun <T : Comparable<T>> SortOrder.buildOp(expression: ExpressionWithColumnType<EntityID<T>>, value: T): ComparisonOp {
     return when (this) {
         SortOrder.ASC,
