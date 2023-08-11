@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "studio.hcmc"
-version = "0.0.10"
+version = "0.0.11"
 
 repositories {
     mavenCentral()
@@ -20,15 +20,16 @@ publishing {
         create<MavenPublication>("maven") {
             groupId = "studio.hcmc"
             artifactId = "exposed-table-extension"
-            version = "0.0.10"
+            version = "0.0.11"
             from(components["java"])
         }
     }
 }
 
 dependencies {
-    implementation("com.github.hcmc-studio:exposed-transaction-extension:0.0.4-release")
-    implementation("com.github.hcmc-studio:kotlin-format-extension:0.0.4-release")
+    implementation("com.github.hcmc-studio:exposed-transaction-extension:0.0.10-release")
+    implementation("com.github.hcmc-studio:kotlin-format-extension:0.0.10-release")
+    implementation("com.github.hcmc-studio:kotlin-protocol-extension:0.0.10-release")
 
     implementation("org.jetbrains.exposed:exposed-core:0.41.1")
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.41.1")
