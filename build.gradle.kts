@@ -27,8 +27,8 @@ publishing {
 }
 
 dependencies {
-    implementation("com.github.hcmc-studio:exposed-transaction-extension:0.0.4-build-01")
-    implementation("com.github.hcmc-studio:kotlin-format-extension:0.0.4-build-01")
+    implementation("com.github.hcmc-studio:exposed-transaction-extension:0.0.4-release")
+    implementation("com.github.hcmc-studio:kotlin-format-extension:0.0.4-release")
 
     implementation("org.jetbrains.exposed:exposed-core:0.41.1")
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.41.1")
