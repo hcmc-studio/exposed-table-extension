@@ -4,36 +4,38 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.wrap
 
-fun <T : Comparable<T>, S : T?> SortOrder.buildOp(expression: ExpressionWithColumnType<in S>, value: T): ComparisonOp {
+typealias ExposedSortOrder = SortOrder
+
+fun <T : Comparable<T>, S : T?> ExposedSortOrder.buildOp(expression: ExpressionWithColumnType<in S>, value: T): ComparisonOp {
     return when (this) {
-        SortOrder.ASC,
-        SortOrder.ASC_NULLS_FIRST,
-        SortOrder.ASC_NULLS_LAST -> GreaterOp(expression, expression.wrap(value))
-        SortOrder.DESC,
-        SortOrder.DESC_NULLS_FIRST,
-        SortOrder.DESC_NULLS_LAST -> LessOp(expression, expression.wrap(value))
+        ExposedSortOrder.ASC,
+        ExposedSortOrder.ASC_NULLS_FIRST,
+        ExposedSortOrder.ASC_NULLS_LAST -> GreaterOp(expression, expression.wrap(value))
+        ExposedSortOrder.DESC,
+        ExposedSortOrder.DESC_NULLS_FIRST,
+        ExposedSortOrder.DESC_NULLS_LAST -> LessOp(expression, expression.wrap(value))
     }
 }
 
-fun <T : Comparable<T>, S : T?> SortOrder.buildOp(expression: Expression<in S>, other: Expression<in S>): ComparisonOp {
+fun <T : Comparable<T>, S : T?> ExposedSortOrder.buildOp(expression: Expression<in S>, other: Expression<in S>): ComparisonOp {
     return when (this) {
-        SortOrder.ASC,
-        SortOrder.ASC_NULLS_FIRST,
-        SortOrder.ASC_NULLS_LAST -> GreaterOp(expression, other)
-        SortOrder.DESC,
-        SortOrder.DESC_NULLS_FIRST,
-        SortOrder.DESC_NULLS_LAST -> LessOp(expression, other)
+        ExposedSortOrder.ASC,
+        ExposedSortOrder.ASC_NULLS_FIRST,
+        ExposedSortOrder.ASC_NULLS_LAST -> GreaterOp(expression, other)
+        ExposedSortOrder.DESC,
+        ExposedSortOrder.DESC_NULLS_FIRST,
+        ExposedSortOrder.DESC_NULLS_LAST -> LessOp(expression, other)
     }
 }
 
 @JvmName("buildOpEntityId")
-fun <T : Comparable<T>> SortOrder.buildOp(expression: ExpressionWithColumnType<EntityID<T>>, value: T): ComparisonOp {
+fun <T : Comparable<T>> ExposedSortOrder.buildOp(expression: ExpressionWithColumnType<EntityID<T>>, value: T): ComparisonOp {
     return when (this) {
-        SortOrder.ASC,
-        SortOrder.ASC_NULLS_FIRST,
-        SortOrder.ASC_NULLS_LAST -> GreaterOp(expression, expression.wrap(value))
-        SortOrder.DESC,
-        SortOrder.DESC_NULLS_FIRST,
-        SortOrder.DESC_NULLS_LAST -> LessOp(expression, expression.wrap(value))
+        ExposedSortOrder.ASC,
+        ExposedSortOrder.ASC_NULLS_FIRST,
+        ExposedSortOrder.ASC_NULLS_LAST -> GreaterOp(expression, expression.wrap(value))
+        ExposedSortOrder.DESC,
+        ExposedSortOrder.DESC_NULLS_FIRST,
+        ExposedSortOrder.DESC_NULLS_LAST -> LessOp(expression, expression.wrap(value))
     }
 }
