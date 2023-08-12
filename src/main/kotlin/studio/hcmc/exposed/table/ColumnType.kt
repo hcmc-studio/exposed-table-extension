@@ -7,7 +7,11 @@ import kotlinx.datetime.LocalTime
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.kotlin.datetime.*
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
+import org.jetbrains.exposed.sql.vendors.currentDialect
+import studio.hcmc.kotlin.protocol.BitMask
+import studio.hcmc.kotlin.protocol.BitMaskFlag
 import java.math.BigDecimal
+import java.sql.ResultSet
 import java.util.*
 import kotlin.time.Duration
 
@@ -154,4 +158,45 @@ fun Table.timestamp(configure: Column<Instant>.() -> Unit = {}) = object : Colum
 fun Table.duration(configure: Column<Duration>.() -> Unit = {}) = object : ColumnDelegate<Duration> {
     override val configure = configure
     override val columnType = KotlinDurationColumnType()
+}
+
+fun <E> Table.bitMask(configure: Column<BitMask<E>>.() -> Unit = {}) where E : Enum<E>, E : BitMaskFlag = object : ColumnDelegate<BitMask<E>> {
+    override val configure = configure
+    override val columnType = BitMaskColumnType<E>()
+
+}
+
+class BitMaskColumnType<E> : ColumnType() where E : Enum<E>, E : BitMaskFlag {
+    override fun sqlType(): String {
+        return currentDialect.dataTypeProvider.integerType()
+    }
+
+    override fun nonNullValueToString(value: Any): String {
+        return when (value) {
+            is String -> value
+            is BitMask<*> -> value.value.toString()
+            else -> error("Unexpected value: $value of ${value::class.qualifiedName}")
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun valueFromDB(value: Any): BitMask<E> {
+        return when (value) {
+            is BitMask<*> -> value as BitMask<E>
+            is Int -> BitMask(value)
+            is String -> BitMask(value.toInt())
+            else -> valueFromDB(value.toString())
+        }
+    }
+
+    override fun readObject(rs: ResultSet, index: Int): Any? {
+        return rs.getInt(index)
+    }
+
+    override fun notNullValueToDB(value: Any): Any {
+        return when {
+            value is BitMask<*> -> value.value
+            else -> value
+        }
+    }
 }
