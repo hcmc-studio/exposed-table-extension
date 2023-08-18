@@ -16,7 +16,7 @@ fun <T : Comparable<T>, E : EntityID<T>> Table.reference(
     configure: Column<T>.() -> Unit = {}
 ): ReadOnlyProperty<Table, Column<T>> = ReadOnlyProperty { table, property ->
     val name = property.name
-    ColumnDelegate.findPresent(table, name) ?: table
+    TableUtils.findPresent(table, name) ?: table
         .registerColumn<T>(name, refColumn.columnType.rawSqlType())
         .apply { foreignKey = ForeignKeyConstraint(refColumn, this, onUpdate, onDelete, fkName) }
         .apply(configure)
@@ -31,7 +31,7 @@ fun <T : Comparable<T>, E : EntityID<T>> Table.referenceEntity(
     configure: Column<E>.() -> Unit = {}
 ): ReadOnlyProperty<Table, Column<E>> = ReadOnlyProperty { table, property ->
     val name = property.name
-    ColumnDelegate.findPresent(table, name) ?: table
+    TableUtils.findPresent(table, name) ?: table
         .let { entityId(name, (refColumn.columnType as EntityIDColumnType<T>).idColumn) as Column<E> }
         .apply { references(refColumn, onDelete, onUpdate, fkName) }
         .apply(configure)
@@ -68,13 +68,21 @@ fun <T : Comparable<T>, E : EntityID<T>> Table.optReferenceEntity(
         .apply(configure)
 }
 
-suspend fun Table.create(transaction: Transaction? = null): List<String> {
+suspend fun <T : Table> T.init(transaction: Transaction? = null): T {
     val table = this
-    return suspendedTransaction(transaction) {
+    suspendedTransaction(transaction) {
         for (memberProperty in table::class.memberProperties) {
             memberProperty.call(table)
         }
+    }
 
+    return table
+}
+
+suspend fun Table.create(transaction: Transaction? = null): List<String> {
+    val table = this
+    return suspendedTransaction(transaction) {
+        table.init(this)
         SchemaUtils.create(table)
         val missingColumns = SchemaUtils.addMissingColumnsStatements(table)
         if (missingColumns.isNotEmpty()) {
@@ -83,5 +91,13 @@ suspend fun Table.create(transaction: Transaction? = null): List<String> {
         }
 
         missingColumns
+    }
+}
+
+suspend fun Table.drop(transaction: Transaction? = null) {
+    val table = this
+    suspendedTransaction(transaction) {
+        table.init(this)
+        SchemaUtils.drop(table)
     }
 }
