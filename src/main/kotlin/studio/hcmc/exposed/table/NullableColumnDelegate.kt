@@ -7,21 +7,27 @@ import studio.hcmc.kotlin.format.NamingStrategy
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
-interface NullableColumnDelegate<T : Any> : ReadOnlyProperty<Table, Column<T?>> {
+abstract class NullableColumnDelegate<T : Any> : ReadOnlyProperty<Table, Column<T?>> {
     companion object {
         var namingStrategy = NamingStrategy.CamelCase
     }
 
-    val configure: Column<T?>.() -> Unit
-    val columnType: IColumnType
+    abstract val configure: Column<T?>.() -> Unit
+    abstract val columnType: IColumnType
+
+    private lateinit var column: Column<T?>
 
     override fun getValue(thisRef: Table, property: KProperty<*>): Column<T?> {
-        val name = namingStrategy.convert(property.name)
-        findPresent<T>(thisRef, name)?.let { return it }
+        if (this::column.isInitialized) {
+            return column
+        }
 
-        return thisRef.registerColumn<T>(name, columnType)
-            .let { TableUtils.nullable(thisRef, it) }
-            .apply(configure)
+        val name = namingStrategy.convert(property.name)
+        column = thisRef.registerColumn(name, columnType)
+        column = TableUtils.nullable(thisRef, column)
+        column.configure()
+
+        return column
     }
 }
 
