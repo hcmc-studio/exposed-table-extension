@@ -4,6 +4,10 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 import kotlin.reflect.KProperty
 
+@Deprecated(
+    message = "Use referenceByIdColumn instead.",
+    replaceWith = ReplaceWith("this.referenceByIdColumn(refColumn, onDelete, onUpdate, fkName, configure)")
+)
 fun <T : Comparable<T>, E : EntityID<T>> Table.reference(
     refColumn: Column<E>,
     onDelete: ReferenceOption? = null,
@@ -30,6 +34,10 @@ fun <T : Comparable<T>, E : EntityID<T>> Table.reference(
     }
 }
 
+@Deprecated(
+    message = "Use optReferenceByIdColumn instead.",
+    replaceWith = ReplaceWith("this.optReferenceByIdColumn(refColumn, onDelete, onUpdate, fkName, configure)")
+)
 fun <T : Comparable<T>, E : EntityID<T>> Table.optReference(
     refColumn: Column<E>,
     onDelete: ReferenceOption? = null,
