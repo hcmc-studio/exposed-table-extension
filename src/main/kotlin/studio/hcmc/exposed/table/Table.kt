@@ -9,7 +9,7 @@ import studio.hcmc.exposed.transaction.suspendedTransaction
 import kotlin.reflect.full.memberProperties
 
 fun <T : Table> T.initBlocking(transaction: Transaction? = null): T {
-    val table =this
+    val table = this
     blockingTransaction(transaction) {
         for (memberProperty in table::class.memberProperties) {
             memberProperty.call(table)
@@ -34,8 +34,8 @@ fun Table.createBlocking(transaction: Transaction? = null): List<String> {
     val table = this
     return blockingTransaction(transaction) {
         table.initBlocking(this)
-        SchemaUtils.create(table)
-        val missingColumns = SchemaUtils.addMissingColumnsStatements(table)
+        SchemaUtils.createMissingTablesAndColumns(table, withLogs = true)
+        val missingColumns = SchemaUtils.addMissingColumnsStatements(table, withLogs = true)
         if (missingColumns.isNotEmpty()) {
             exposedLogger.warn("Missing column(s) for table `${tableName}`: $missingColumns")
             execInBatch(missingColumns)
