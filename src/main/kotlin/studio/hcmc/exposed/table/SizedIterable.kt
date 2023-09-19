@@ -11,3 +11,11 @@ fun <T> SizedIterable<T>.orderBy(vararg order: Pair<Expression<*>, SortOrder>): 
         expression to sortOrder.toExposedSortOrder()
     })
 }
+
+fun <T> SizedIterable<T>.page(pageSize: Int, pageIndex: Int?): SizedIterable<T> {
+    if (pageIndex == null) {
+        return this
+    } else {
+        return limit(pageSize, (pageIndex * pageSize).toLong())
+    }
+}
