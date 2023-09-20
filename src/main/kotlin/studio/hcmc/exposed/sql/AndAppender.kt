@@ -25,6 +25,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.notInList
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.notInSubQuery
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.notLike
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.regexp
+import org.jetbrains.exposed.sql.ops.SingleValueInListOp
 import org.jetbrains.exposed.sql.vendors.FunctionProvider
 import studio.hcmc.kotlin.format.toKotlinInstant
 import java.sql.Date
@@ -275,26 +276,38 @@ fun <T : Comparable<T>, ID : EntityID<T>?> Op<Boolean>.andNotInList(list: Iterab
 
 // Extension Operators
 
-fun <T : Instant?> Op<Boolean>.andDateEq(t: String?, expression: ExpressionWithColumnType<T>): Op<Boolean> {
+fun Op<Boolean>.andDateEq(t: String?, expression: ExpressionWithColumnType<out Instant?>): Op<Boolean> {
     return t?.let { this trueAnd (expression dateEq Date.valueOf(it).toKotlinInstant()) } ?: this
 }
 
-fun <T : Instant?> Op<Boolean>.andDateNeq(t: String?, expression: ExpressionWithColumnType<T>): Op<Boolean> {
+fun Op<Boolean>.andDateNeq(t: String?, expression: ExpressionWithColumnType<out Instant?>): Op<Boolean> {
     return t?.let { this trueAnd (expression dateNeq Date.valueOf(it).toKotlinInstant()) } ?: this
 }
 
-fun <T : Instant?> Op<Boolean>.andDateLess(t: String?, expression: ExpressionWithColumnType<T>): Op<Boolean> {
+fun Op<Boolean>.andDateLess(t: String?, expression: ExpressionWithColumnType<out Instant?>): Op<Boolean> {
     return t?.let { this trueAnd (expression less Date.valueOf(it).toKotlinInstant()) } ?: this
 }
 
-fun <T : Instant?> Op<Boolean>.andDateLessEq(t: String?, expression: ExpressionWithColumnType<T>): Op<Boolean> {
+fun Op<Boolean>.andDateLessEq(t: String?, expression: ExpressionWithColumnType<out Instant?>): Op<Boolean> {
     return t?.let { this trueAnd (expression less (Date.valueOf(it).toKotlinInstant() + 1.days)) } ?: this
 }
 
-fun <T : Instant?> Op<Boolean>.andDateGreater(t: String?, expression: ExpressionWithColumnType<T>): Op<Boolean> {
+fun Op<Boolean>.andDateGreater(t: String?, expression: ExpressionWithColumnType<out Instant?>): Op<Boolean> {
     return t?.let { this trueAnd (expression greater Date.valueOf(it).toKotlinInstant()) } ?: this
 }
 
-fun <T : Instant?> Op<Boolean>.andDateGreaterEq(t: String?, expression: ExpressionWithColumnType<T>): Op<Boolean> {
+fun Op<Boolean>.andDateGreaterEq(t: String?, expression: ExpressionWithColumnType<out Instant?>): Op<Boolean> {
     return t?.let { this trueAnd (expression greater (Date.valueOf(it).toKotlinInstant() + 1.days)) } ?: this
+}
+
+fun Op<Boolean>.andDateInList(list: Iterable<String>?, expression: ExpressionWithColumnType<out Instant?>): Op<Boolean> {
+    return list
+        ?.map { Date.valueOf(it).toKotlinInstant() }
+        ?.let { this trueAnd SingleValueInListOp(expression, it, isInList = true) } ?: this
+}
+
+fun Op<Boolean>.andDateNotInList(list: Iterable<String>?, expression: ExpressionWithColumnType<out Instant?>): Op<Boolean> {
+    return list
+        ?.map { Date.valueOf(it).toKotlinInstant() }
+        ?.let { this trueAnd SingleValueInListOp(expression, it, isInList = false) } ?: this
 }
