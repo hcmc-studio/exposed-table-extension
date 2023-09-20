@@ -19,3 +19,4 @@ inline fun <reified Order : ListOptionOrder> Order.buildOrder(table: Table): Arr
 
     return list.toTypedArray()
 }
+
