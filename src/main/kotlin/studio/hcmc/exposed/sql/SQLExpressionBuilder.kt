@@ -42,9 +42,9 @@ infix fun <E> ExpressionWithColumnType<in BitMask<E>>.disabled(flag: E): Op<Bool
 }
 
 internal infix fun Op<Boolean>.trueAnd(op: Op<Boolean>): Op<Boolean> {
-    return if (this === Op.TRUE) {
+    return if (this == Op.TRUE) {
         op
-    } else if (this === Op.FALSE) {
+    } else if (this == Op.FALSE) {
         this
     } else {
         this and op
@@ -52,9 +52,9 @@ internal infix fun Op<Boolean>.trueAnd(op: Op<Boolean>): Op<Boolean> {
 }
 
 internal infix fun Op<Boolean>.trueOr(op: Op<Boolean>): Op<Boolean> {
-    return if (this === Op.TRUE) {
+    return if (this == Op.TRUE) {
         this
-    } else if (this === Op.FALSE) {
+    } else if (this == Op.FALSE) {
         op
     } else {
         this or op

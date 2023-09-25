@@ -154,7 +154,7 @@ fun <T> Op<Boolean>.andHasFlag(t: T?, expression: ExpressionWithColumnType<T>): 
 }
 
 fun <T : String?> Op<Boolean>.andLike(pattern: String?, expression: Expression<T>): Op<Boolean> {
-    return pattern?.let { this trueAnd (expression like it) } ?: this
+    return pattern?.let { this trueAnd (expression like it.wrapLikePattern()) } ?: this
 }
 
 fun <T : String?> Op<Boolean>.andLike(pattern: LikePattern?, expression: Expression<T>): Op<Boolean> {
@@ -163,7 +163,7 @@ fun <T : String?> Op<Boolean>.andLike(pattern: LikePattern?, expression: Express
 
 @JvmName("andLikeWithEntityID")
 fun Op<Boolean>.andLike(pattern: String?, expression: Expression<EntityID<String>>): Op<Boolean> {
-    return pattern?.let { this trueAnd (expression like it) } ?: this
+    return pattern?.let { this trueAnd (expression like it.wrapLikePattern()) } ?: this
 }
 
 @JvmName("andLikeWithEntityID")
@@ -310,4 +310,8 @@ fun Op<Boolean>.andDateNotInList(list: Iterable<String>?, expression: Expression
     return list
         ?.map { Date.valueOf(it).toKotlinInstant() }
         ?.let { this trueAnd SingleValueInListOp(expression, it, isInList = false) } ?: this
+}
+
+private fun String.wrapLikePattern(): String {
+    return "%${replace("%", "\\\\%").replace("_", "\\\\_")}%"
 }

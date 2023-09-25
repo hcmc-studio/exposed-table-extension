@@ -90,6 +90,14 @@ fun ListOptionFilter.BitMaskElement<*>.buildOp(column: Column<BitMask<*>>): Op<B
     return op
 }
 
+fun ListOptionFilter.EnumElement<*>.buildOp(column: Column<Enum<*>>): Op<Boolean> {
+    return Op.TRUE
+        .andEq(eq, column)
+        .andNeq(neq, column)
+        .andInList(inList, column)
+        .andNotInList(notInList, column)
+}
+
 @Suppress("UNCHECKED_CAST")
 fun ListOptionFilter.buildOp(table: Table): Op<Boolean> {
     val columns = table.columns.associateBy { it.name }
@@ -168,6 +176,10 @@ fun ListOptionFilter.buildOp(table: Table): Op<Boolean> {
             is ListOptionFilter.BitMaskElement<*> -> {
                 op = op and element.buildOp(column as Column<BitMask<*>>)
             }
+            is ListOptionFilter.EnumElement<*> -> {
+                op = op and element.buildOp(column as Column<Enum<*>>)
+            }
+
         }
     }
 
