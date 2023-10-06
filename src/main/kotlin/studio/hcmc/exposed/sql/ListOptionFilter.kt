@@ -79,6 +79,22 @@ fun ListOptionFilter.DateElement.buildOp(column: Column<Instant>): Op<Boolean> {
         .andDateNotInList(notInList, column)
 }
 
+fun ListOptionFilter.BooleanElement.buildOp(column: Column<Boolean>): Op<Boolean> {
+    return Op.TRUE.andEq(eq, column)
+}
+
+fun ListOptionFilter.CharElement.buildOp(column: Column<Char>): Op<Boolean> {
+    return Op.TRUE
+        .andEq(eq, column)
+        .andNeq(neq, column)
+        .andLess(less, column)
+        .andLessEq(lessEq, column)
+        .andGreater(greater, column)
+        .andGreaterEq(greaterEq, column)
+        .andInList(inList, column)
+        .andNotInList(notInList, column)
+}
+
 fun ListOptionFilter.BitMaskElement<*>.buildOp(column: Column<BitMask<*>>): Op<Boolean> {
     var op = Op.TRUE
         .andEq(eq, column)
@@ -179,7 +195,12 @@ fun ListOptionFilter.buildOp(table: Table): Op<Boolean> {
             is ListOptionFilter.EnumElement<*> -> {
                 op = op and element.buildOp(column as Column<Enum<*>>)
             }
-
+            is ListOptionFilter.BooleanElement -> {
+                op = op and element.buildOp(column as Column<Boolean>)
+            }
+            is ListOptionFilter.CharElement -> {
+                op = op and element.buildOp(column as Column<Char>)
+            }
         }
     }
 
