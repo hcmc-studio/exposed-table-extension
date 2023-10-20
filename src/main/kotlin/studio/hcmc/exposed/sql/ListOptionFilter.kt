@@ -2,12 +2,9 @@ package studio.hcmc.exposed.sql
 
 import kotlinx.datetime.Instant
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.Op
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.bitwiseAnd
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.and
 import studio.hcmc.kotlin.protocol.BitMask
 import studio.hcmc.kotlin.protocol.io.ListOptionFilter
 import kotlin.reflect.KClass
@@ -118,8 +115,9 @@ fun ListOptionFilter.EnumElement<*>.buildOp(column: Column<Enum<*>>): Op<Boolean
 fun ListOptionFilter.buildOp(table: Table): Op<Boolean> {
     val columns = table.columns.associateBy { it.name }
     val clazz = this::class as KClass<ListOptionFilter>
+    val properties = clazz.memberProperties
     var op: Op<Boolean> = Op.TRUE
-    for (property in clazz.memberProperties) {
+    for (property in properties) {
         val element = property.get(this) as? ListOptionFilter.Element ?: continue
         val column = columns[property.name] ?: continue
         when (element) {
@@ -203,6 +201,5 @@ fun ListOptionFilter.buildOp(table: Table): Op<Boolean> {
             }
         }
     }
-
     return op
 }
