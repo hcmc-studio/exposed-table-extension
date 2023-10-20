@@ -20,6 +20,8 @@ fun <T> ListOptionFilter.NumericElement<T>.buildOp(column: Column<T>): Op<Boolea
         .andGreaterEq(greaterEq, column)
         .andInList(inList, column)
         .andNotInList(notInList, column)
+        .andIsNull(isNull, column)
+        .andIsNotNull(isNotNull, column)
 }
 
 @JvmName("buildOpEntityID")
@@ -33,6 +35,8 @@ fun <T> ListOptionFilter.NumericElement<T>.buildOp(column: Column<EntityID<T>>):
         .andGreaterEq(greaterEq, column)
         .andInList(inList, column)
         .andNotInList(notInList, column)
+        .andIsNull(isNull, column)
+        .andIsNotNull(isNotNull, column)
 }
 
 fun ListOptionFilter.StringElement.buildOp(column: Column<String>): Op<Boolean> {
@@ -47,6 +51,8 @@ fun ListOptionFilter.StringElement.buildOp(column: Column<String>): Op<Boolean> 
         .andNotLike(notLike, column)
         .andInList(inList, column)
         .andNotInList(notInList, column)
+        .andIsNull(isNull, column)
+        .andIsNotNull(isNotNull, column)
 }
 
 @JvmName("buildOpEntityID")
@@ -62,6 +68,8 @@ fun ListOptionFilter.StringElement.buildOp(column: Column<EntityID<String>>): Op
         .andNotLike(notLike, column)
         .andInList(inList, column)
         .andNotInList(notInList, column)
+        .andIsNull(isNull, column)
+        .andIsNotNull(isNotNull, column)
 }
 
 fun ListOptionFilter.DateElement.buildOp(column: Column<Instant>): Op<Boolean> {
@@ -74,10 +82,15 @@ fun ListOptionFilter.DateElement.buildOp(column: Column<Instant>): Op<Boolean> {
         .andDateGreaterEq(greaterEq, column)
         .andDateInList(inList, column)
         .andDateNotInList(notInList, column)
+        .andIsNull(isNull, column)
+        .andIsNotNull(isNotNull, column)
 }
 
 fun ListOptionFilter.BooleanElement.buildOp(column: Column<Boolean>): Op<Boolean> {
-    return Op.TRUE.andEq(eq, column)
+    return Op.TRUE
+        .andEq(eq, column)
+        .andIsNull(isNull, column)
+        .andIsNotNull(isNotNull, column)
 }
 
 fun ListOptionFilter.CharElement.buildOp(column: Column<Char>): Op<Boolean> {
@@ -90,12 +103,16 @@ fun ListOptionFilter.CharElement.buildOp(column: Column<Char>): Op<Boolean> {
         .andGreaterEq(greaterEq, column)
         .andInList(inList, column)
         .andNotInList(notInList, column)
+        .andIsNull(isNull, column)
+        .andIsNotNull(isNotNull, column)
 }
 
 fun ListOptionFilter.BitMaskElement<*>.buildOp(column: Column<BitMask<*>>): Op<Boolean> {
     var op = Op.TRUE
         .andEq(eq, column)
         .andNeq(neq, column)
+        .andIsNull(isNull, column)
+        .andIsNotNull(isNotNull, column)
     op = includeAll?.let { op trueAnd ((column bitwiseAnd it) eq it) } ?: op
     op = includeAny?.let { op trueAnd ((column bitwiseAnd it) neq 0) } ?: op
     op = excludeAll?.let { op trueAnd ((column bitwiseAnd it) eq 0) } ?: op
@@ -109,6 +126,8 @@ fun ListOptionFilter.EnumElement<*>.buildOp(column: Column<Enum<*>>): Op<Boolean
         .andNeq(neq, column)
         .andInList(inList, column)
         .andNotInList(notInList, column)
+        .andIsNull(isNull, column)
+        .andIsNotNull(isNotNull, column)
 }
 
 @Suppress("UNCHECKED_CAST")
