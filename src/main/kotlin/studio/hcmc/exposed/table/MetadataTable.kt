@@ -14,12 +14,3 @@ abstract class IntMetadataTable(original: IntIdTable, name: String = "") : Metad
 abstract class LongMetadataTable(original: LongIdTable, name: String = "") : MetadataTable<Long>(original, name)
 
 abstract class UUIDMetadataTable(original: UUIDTable, name: String = "") : MetadataTable<UUID>(original, name)
-
-//  - - - 0
-//  P - - 1
-//  - F - 2
-//  P F - 3
-//  - - U 4
-//  P - U X
-//  - F U 6
-//  P F U X
